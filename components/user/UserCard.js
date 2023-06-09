@@ -23,12 +23,7 @@ export default function UserCard({ profile }) {
         <h3 className="text-xl justify-center text-center mb-2 text-tertiary-medium font-bold">
           {profile.name}
         </h3>
-        {/* Links inside a link is not allowed, remove them from bio in card */}
-        <ReactMarkdown
-          disallowedElements={["a"]}
-          unwrapDisallowed
-          className="text-center line-clamp-5"
-        >
+        <ReactMarkdown className="text-center line-clamp-5">
           {profile.bio}
         </ReactMarkdown>
       </div>

@@ -18,7 +18,7 @@ export default function Map({ users }) {
         zoom={2}
         minZoom={2}
         zoomControl={true}
-        scrollWheelZoom={true}
+        scrollWheelZoom={false}
         maxBounds={boundsMap}
         maxBoundsViscosity={0.7}
         style={{ height: "100vh" }}

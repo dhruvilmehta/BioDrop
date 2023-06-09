@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { FaMicrophoneAlt, FaMapPin } from "react-icons/fa";
 import {
   MdOutlineOnlinePrediction,
@@ -13,21 +12,10 @@ import FallbackImage from "@components/FallbackImage";
 
 export default function EventCard({ event, username }) {
   const fallbackImageSize = 60;
-  const [startTime, setStartTime] = useState(event.date.startFmt)
-  const [endTime, setEndTime] = useState(event.date.endFmt)
-  
-  useEffect((() => {
-    const dateTimeStyle = {
-      dateStyle: "full",
-      timeStyle: "long",
-    };
-    setStartTime( new Intl.DateTimeFormat("en-GB", dateTimeStyle).format(
-      new Date(event.date.start)
-    ));
-    setEndTime( new Intl.DateTimeFormat("en-GB", dateTimeStyle).format(
-      new Date(event.date.end)
-    ));
-  }),[event.date])
+  const dateTimeStyle = {
+    dateStyle: "full",
+    timeStyle: "long",
+  };
 
   return (
     <li
@@ -42,7 +30,10 @@ export default function EventCard({ event, username }) {
             <MdOutlineOnlinePrediction title="Virtual event" />
           )}
           {event.isInPerson && <MdOutlinePeople title="In person event" />}
-          {event.date.cfpOpen && <FaMicrophoneAlt title="CFP is open" />}
+          {event.date.cfpClose &&
+            new Date(event.date.cfpClose) > new Date() && (
+              <FaMicrophoneAlt title="CFP is open" />
+            )}
           {event.price?.startingFrom > 0 && <TbCoin title="Paid event" />}
           {event.price?.startingFrom === 0 && <TbCoinOff title="Free event" />}
         </div>
@@ -74,11 +65,15 @@ export default function EventCard({ event, username }) {
               </div>
               <p className="text-sm text-primary-high dark:text-primary-low flex flex-col lg:flex-row gap-2">
                 <span>
-                  {startTime}
+                  {new Intl.DateTimeFormat("en-GB", dateTimeStyle).format(
+                    new Date(event.date.start)
+                  )}
                 </span>
                 <MdOutlineArrowRightAlt className="self-center hidden lg:block" />
                 <span>
-                  {endTime}
+                  {new Intl.DateTimeFormat("en-GB", dateTimeStyle).format(
+                    new Date(event.date.end)
+                  )}
                 </span>
               </p>
               <ReactMarkdown className="text-sm text-primary-medium dark:text-primary-low-medium py-1 flex-wrap">

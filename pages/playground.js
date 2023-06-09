@@ -6,10 +6,9 @@ import Modal from "@components/Modal";
 import Input from "@components/form/Input";
 import UserPage from "@components/user/UserPage";
 import Notification from "@components/Notification";
-import { clientEnv } from "@config/schemas/clientSchema";
 
 export default function Playground() {
-  const BASE_URL = clientEnv.NEXT_PUBLIC_BASE_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const defaultJson = `{
     "name": "Your Name",
     "bio": "Write a short bio about yourself",
@@ -76,8 +75,7 @@ export default function Playground() {
       if (gitUsername && profileJson && handleValidateJson()) {
         setErrMsg("");
         let actualJson = { username: gitUsername, ...JSON.parse(profileJson) };
-        actualJson.testimonials = actualJson.testimonials || [];
-        actualJson.socials = actualJson.socials || [];
+        delete actualJson.testimonials;
         setPreviewModalData(actualJson);
         setPreviewModalState(true);
       }
@@ -87,26 +85,6 @@ export default function Playground() {
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 1500);
     }
-  };
-
-  const buttonProps = () => {
-    if (!formatComplete) {
-      return { children: "Format", onClick: handleFormatJson, primary: false };
-    }
-
-    if (formatComplete && !validateComplete) {
-      return {
-        children: "Validate",
-        onClick: handleValidateJson,
-        primary: false,
-      };
-    }
-
-    if (formatComplete && validateComplete) {
-      return { children: "Preview", onClick: handlePreview, primary: true };
-    }
-
-    return { children: "", disable: true };
   };
 
   return (
@@ -162,7 +140,19 @@ export default function Playground() {
           }}
         />
         <div className="flex flex-row justify-end mb-3 gap-2">
-          <Button {...buttonProps()} />
+          {!formatComplete && (
+            <Button text="Format" onClick={handleFormatJson} primary={false} />
+          )}
+          {formatComplete && !validateComplete && (
+            <Button
+              text="Validate"
+              onClick={handleValidateJson}
+              primary={false}
+            />
+          )}
+          {formatComplete && validateComplete && (
+            <Button text="Preview" onClick={handlePreview} primary={true} />
+          )}
         </div>
 
         <Modal

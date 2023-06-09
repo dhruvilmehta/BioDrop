@@ -1,11 +1,10 @@
 import mongoose from "mongoose";
 import logger from "./logger";
-import { serverEnv } from "@config/schemas/serverSchema";
 
 let connection;
 
 const connectMongo = async () => {
-  const { LINKFREE_MONGO_CONNECTION_STRING } = serverEnv;
+  const { LINKFREE_MONGO_CONNECTION_STRING } = process.env;
 
   if (!LINKFREE_MONGO_CONNECTION_STRING) {
     throw new Error(
@@ -18,7 +17,7 @@ const connectMongo = async () => {
   }
 
   try {
-    const options = { autoIndex: true, family: 4, maxPoolSize: 10 };
+    const options = { autoIndex: true, family: 4 };
     connection = await mongoose.connect(
       LINKFREE_MONGO_CONNECTION_STRING,
       options

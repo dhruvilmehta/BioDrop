@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { ImCross } from "react-icons/im";
 
 export default function Modal({ show = false, setShow, title, children }) {
   return (
@@ -37,7 +37,7 @@ export default function Modal({ show = false, setShow, title, children }) {
                     onClick={() => setShow(false)}
                   >
                     <span className="sr-only">Close</span>
-                    <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+                    <ImCross className="h-6 w-6" aria-hidden="true" />
                   </button>
                 </div>
                 <div className="m-4">{children}</div>

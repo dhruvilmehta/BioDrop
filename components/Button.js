@@ -5,7 +5,6 @@ export default function Button({
   text,
   primary = false,
   disable,
-  children,
   ...restProps
 }) {
   let className =
@@ -19,14 +18,16 @@ export default function Button({
         : " cursor-pointer");
 
   const link = (
-    <Link className={className} prefetch={false} {...restProps}>
-      {children}
+    <Link className={className} {...restProps}>
+      {icon && <span className="mr-2">{icon}</span>}
+      {text}
     </Link>
   );
 
   const button = (
     <button className={className} disabled={disable} {...restProps}>
-      {children}
+      {icon && <span className="mr-2">{icon}</span>}
+      {text}
     </button>
   );
 

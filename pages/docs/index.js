@@ -298,6 +298,15 @@ export default function DocsIndex() {
           },
         },
         {
+          name: "Single User Mode",
+          path: "/docs/advanced/single-user-mode",
+          description: "Self host LinkFree for your single Profile.",
+          category: {
+            name: "Advanced",
+            color: "bg-red-100 text-red-800",
+          },
+        },
+        {
           name: "Map Information",
           path: "/docs/map",
           description: "Information describing how the map feature works.",

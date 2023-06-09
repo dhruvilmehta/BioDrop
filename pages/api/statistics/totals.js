@@ -36,14 +36,17 @@ export async function getTotalStats() {
 
   let activeProfiles = 0;
   try {
-    activeProfiles = await Profile.countDocuments({ isEnabled: true });
+    activeProfiles = await Profile.find({}).estimatedDocumentCount();
   } catch (e) {
     logger.error(e, "failed to load profile statistics");
   }
 
-  let totalProfiles = 0;
+  const directoryPath = path.join(process.cwd(), "data");
+  let totalProfiles = [];
   try {
-    totalProfiles = await Profile.find({}).estimatedDocumentCount();
+    totalProfiles = fs
+      .readdirSync(directoryPath)
+      .filter((item) => item.includes("json"));
   } catch (e) {
     logger.error(e, "failed to load profile list");
   }
@@ -53,7 +56,7 @@ export async function getTotalStats() {
     stats: {
       views: totalStats[0]?.totalViews || 0,
       clicks: totalStats[0]?.totalClicks || 0,
-      users: totalProfiles || 0,
+      users: totalProfiles.length || 0,
       active: activeProfiles || 0,
     },
   };

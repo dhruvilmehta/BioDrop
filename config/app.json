@@ -1,18 +1,15 @@
 {
-  "version": "1.140.0",
+  "version": "1.133.0",
   "alerts": [],
   "isr": {
     "homepage": {
-      "revalidateSeconds": 900,
-      "description": "15 * 60 = 15 minutes"
+      "revalidateSeconds": 900
     },
     "mapPage": {
-      "revalidateSeconds": 43200,
-      "description": "12 * 60 * 60 = 12 hours"
+      "revalidateSeconds": 43200
     },
     "searchPage": {
-      "revalidateSeconds": 300,
-      "description": "5 * 60 = 5 minutes"
+      "revalidateSeconds": 7200
     }
   }
 }

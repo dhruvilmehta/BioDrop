@@ -13,18 +13,14 @@ export default async function handler(req, res) {
 
   res.status(200).json(profiles);
 }
-export async function getUsers(options = {}) {
+export async function getUsers() {
   await connectMongo();
 
   let profiles = [];
-  const { cards } = { cards: false, ...options };
-  const fields = cards
-    ? ["username", "name", "bio", "tags", "-_id"]
-    : ["username", "name", "bio", "tags", "location", "-_id"];
   try {
     profiles = await Profile.find(
       { name: { $exists: true }, isEnabled: true },
-      fields
+      ["username", "name", "bio", "tags", "location"]
     );
   } catch (e) {
     logger.error(e, "failed loading profiles");

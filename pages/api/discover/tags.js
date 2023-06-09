@@ -11,33 +11,17 @@ export default async function handler(req, res) {
   const tags = await getTags();
   res.status(200).json(tags);
 }
-export async function getTags(location = false) {
+export async function getTags() {
   let tags = [];
-
-  const matchQuery = location
-    ? {
-        $match: {
-          tags: { $exists: true },
-          "location.provided": {
-            $exists: true,
-            $ne: null,
-            $ne: "unknown",
-            $ne: "remote",
-          },
-          "location.name": { $ne: "unknown" },
-        },
-      }
-    : { $match: { tags: { $exists: true } } };
-
   try {
     tags = await Profile.aggregate([
-      matchQuery,
+      { $match: { tags: { $exists: true } } },
       {
         $unwind: "$tags",
       },
       {
         $group: {
-          _id: { $toLower: "$tags" },
+          _id: "$tags",
           total: { $sum: 1 },
         },
       },

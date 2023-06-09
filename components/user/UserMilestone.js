@@ -8,7 +8,10 @@ export default function UserMilestone({ milestone, isGoal }) {
   const DisplayIcon = getIcon(milestone.icon);
   return (
     <li
-      className={`py-4 ${isGoal ? "opacity-50" : ""} border-gray-300`}
+      className={`py-4 ${isGoal ? "opacity-50" : ""}`}
+      style={{
+        borderColor: milestone.color,
+      }}
     >
       <div className="flex space-x-3">
         {milestone.icon && <DisplayIcon className="h-8 w-8 rounded-full" />}

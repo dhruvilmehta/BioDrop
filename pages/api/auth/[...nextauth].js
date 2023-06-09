@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 
-import { serverEnv } from "@config/schemas/serverSchema";
 import DbAdapter from "./db-adapter";
 import connectMongo from "@config/mongo";
 
@@ -9,8 +8,8 @@ export const authOptions = {
   adapter: DbAdapter(connectMongo),
   providers: [
     GithubProvider({
-      clientId: serverEnv.GITHUB_ID,
-      clientSecret: serverEnv.GITHUB_SECRET,
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
       profile(profile) {
         return {
           id: profile.id.toString(),

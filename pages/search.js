@@ -10,7 +10,7 @@ import Badge from "@components/Badge";
 import logger from "@config/logger";
 import Input from "@components/form/Input";
 import { getTags } from "./api/discover/tags";
-import { getUsers } from "./api/profiles";
+import { getUsers } from "./api/users";
 import config from "@config/app.json";
 
 export async function getStaticProps() {
@@ -20,7 +20,7 @@ export async function getStaticProps() {
     tags: [],
   };
   try {
-    data.users = await getUsers({ cards: true });
+    data.users = await getUsers();
   } catch (e) {
     logger.error(e, "ERROR search users");
   }
@@ -31,77 +31,51 @@ export async function getStaticProps() {
     logger.error(e, "ERROR loading tags");
   }
 
-  if (data.users.length > 5) {
-    data.randUsers = data.users.sort(() => 0.5 - Math.random()).slice(0, 5);
-  } else {
-    data.randUsers = data.users;
-  }
-
   return {
     props: { data },
     revalidate: pageConfig.revalidateSeconds,
   };
 }
 
-export default function Search({ data: { users, tags, randUsers } }) {
+export default function Search({ data }) {
+  let { users, tags } = data;
   const router = useRouter();
   const { username, keyword } = router.query;
   const [notFound, setNotFound] = useState();
-  const [filteredUsers, setFilteredUsers] = useState(randUsers);
+
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [inputValue, setInputValue] = useState(username || keyword || "");
   let results = [];
+
+  const getRandomUsers = () => {
+    return users.sort(() => 0.5 - Math.random()).slice(0, 5);
+  };
+
   useEffect(() => {
     if (username) {
       setNotFound(username);
     }
   }, [username]);
-  
-  useEffect(() => {
-    if (!inputValue) {
-      //Setting the users as null when the input field is empty
-      setFilteredUsers(randUsers);
-      //Removing the not found field when the input field is empty
-      setNotFound();
-      return;
-    }
-    
-    if (inputValue.length < 2) {
-      return;
-    }
-    
-    const timer = setTimeout(() => {
-      filterData(inputValue);
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, [inputValue]);
-  
 
   const filterData = (value) => {
-    const cleanedInput = cleanSearchInput(value);
-    const terms = cleanedInput.split(",");
+    const valueLower = value.toLowerCase();
+    const terms = valueLower.split(",");
 
     results = users.filter((user) => {
-      const nameLower = user.name.toLowerCase();
-      const usernameLower = user.username.toLowerCase();
-      const userTagsString = user.tags.join(", ").toLowerCase();
-      
-      // check if all search terms/keywords are matching with the the uses
-      const isUserMatched = terms.every((term) => {
-        const cleanedTerm = term.trim();
+      if (user.name.toLowerCase().includes(valueLower)) {
+        return true;
+      }
+      if (user.username.toLowerCase().includes(valueLower)) {
+        return true;
+      }
 
-        if(!cleanedInput) {
-          return false;
-        };
+      let userTags = user.tags?.map((tag) => tag.toLowerCase());
 
-        return (
-          usernameLower.includes(cleanedTerm) || 
-          nameLower.includes(cleanedTerm) ||  
-          userTagsString.includes(cleanedTerm)
-        );
-      });
+      if (terms.every((keyword) => userTags?.includes(keyword))) {
+        return true;
+      }
 
-      return isUserMatched;
+      return false;
     });
 
     if (!results.length) {
@@ -116,18 +90,15 @@ export default function Search({ data: { users, tags, randUsers } }) {
   };
 
   const search = (keyword) => {
-    const cleanedInput = cleanSearchInput(inputValue);
-
-    if (!cleanedInput.length) {
+    if (!inputValue.length) {
       return setInputValue(keyword);
     }
 
-    const items = cleanedInput.split(",");
-    
-    if (cleanedInput.length) {
-      if (searchTagNameInInput(inputValue, keyword)) {
+    const items = inputValue.split(",");
+    if (inputValue.length) {
+      if (items.includes(keyword)) {
         return setInputValue(
-          items.filter((item) => item.trim() !== keyword).join(",")
+          items.filter((item) => item !== keyword).join(",")
         );
       }
 
@@ -137,22 +108,25 @@ export default function Search({ data: { users, tags, randUsers } }) {
     setInputValue(keyword);
   };
 
-  // removes leading/trailing whitespaces and extra spaces and converted to lowercase
-  const cleanSearchInput = (searchInput) => {
-    return searchInput.trim().replace(/\s{2,}/g, ' ').toLowerCase();
-  }
-
-  const searchTagNameInInput = (searchInput, tagName) => {
-    const tags = cleanSearchInput(searchInput).split(",");
-    
-    for(let tag of tags) {
-      if(tag.trim() === tagName.toLowerCase()) {
-        return true;
-      };
+  useEffect(() => {
+    if (!inputValue) {
+      //Setting the users as null when the input field is empty
+      setFilteredUsers(getRandomUsers());
+      //Removing the not found field when the input field is empty
+      setNotFound();
+      return;
     }
-    
-    return false;
-  }
+
+    if (inputValue.length < 2) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      filterData(inputValue);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [inputValue]);
 
   return (
     <>
@@ -172,7 +146,10 @@ export default function Search({ data: { users, tags, randUsers } }) {
                   key={tag.name}
                   name={tag.name}
                   total={tag.total}
-                  selected={searchTagNameInInput(inputValue, tag.name)}
+                  selected={inputValue
+                    .toLowerCase()
+                    .split(",")
+                    .includes(tag.name.toLowerCase())}
                   onClick={() => search(tag.name)}
                 />
               ))}
